@@ -43,6 +43,7 @@ module GettextToI18n
     # example: 
     # Base.get_name('/controllers/apidoc_controller.rb', 'controller') => 'apidoc'
     def self.get_name(file, type)
+     
       case type
         when :controller
           if result = /application\.rb/.match(file)
@@ -53,7 +54,7 @@ module GettextToI18n
           end
           return ""
         when :view
-          result = /views\/([a-zA-Z]+)\//.match(file)
+          result = /views\/([\_a-zA-Z]+)\//.match(file)
           return result[1]
           
       end
