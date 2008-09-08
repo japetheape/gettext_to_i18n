@@ -4,6 +4,9 @@ This plugin will convert all of your existing Gettext calls( _('some translation
 I18n::t '(controller|view).id'. It inserts the translations into a new locale file "config/locales/standard.yml".
 
 
+Namespace
+=========
+By default your application will be divided into namespaces. For each namespace.
 
 
 

@@ -1,6 +1,6 @@
 require 'test/unit'
 require File.dirname(__FILE__) + '/../init.rb'
-
+require 'YAML'
 
 class GettextToI18nTest < Test::Unit::TestCase
   
@@ -44,8 +44,7 @@ class GettextToI18nTest < Test::Unit::TestCase
   
   def test_transform
     a = GettextToI18n::Base.new
-    
-    puts a.translations.inspect
+    puts YAML::dump( a.translations)
   end
   
   
