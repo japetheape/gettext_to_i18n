@@ -17,4 +17,4 @@ To convert all your views, controllers and models to the new format.
 rake gettext_to_i18n:transform
 
 
-Copyright (c) 2008 [name of plugin creator], released under the MIT license
+Copyright (c) 2008 Jaap van der Meer, released under the MIT license

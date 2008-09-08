@@ -34,10 +34,7 @@ class GettextToI18nTest < Test::Unit::TestCase
   def test_get_filename
     assert_equal 'apidoc', GettextToI18n::Base.get_name('/controllers/apidoc_controller.rb', :controller)
     assert_equal 'application', GettextToI18n::Base.get_name('/controllers/application.rb', :controller)
-    
     assert_equal 'page', GettextToI18n::Base.get_name('/views/page/index.html.erb', :view)
-  
-  
   end
   
   
