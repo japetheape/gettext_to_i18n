@@ -5,9 +5,9 @@ module GettextToI18n
    
    attr_reader :translations
    
-   def initialize(file)
+   def initialize(file, options = {})
      @file = file
-     
+     @options = options
    end
    
    def transform!
@@ -17,7 +17,19 @@ module GettextToI18n
        # TODO multiple line methods
        if result = get_translation_and_id(line)
          
-          add_translation(result[:id], result[:translation])
+          if @options[:ask_for_identifiers]
+            puts "#{@file}: Enter message id for #{result[:translation]}: [#{result[:id]}]"
+            id = STDIN.gets.chomp
+            unless id == ""
+              add_translation(id, result[:translation])
+            else
+              add_translation(result[:id], result[:translation])
+            end
+          else
+             add_translation(result[:id], result[:translation])
+          end
+          
+        
           # TODO change line
        end
      end

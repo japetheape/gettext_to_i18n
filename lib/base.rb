@@ -20,6 +20,7 @@ module GettextToI18n
         convertor.transform!
         
         name = Base.get_name(file, type)
+        
         unless @translations[namespace][name].nil?
           raise "Already defined namespace: #{namspace}.#{name}"
         end

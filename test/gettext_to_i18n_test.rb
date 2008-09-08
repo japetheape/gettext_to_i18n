@@ -21,7 +21,7 @@ class GettextToI18nTest < Test::Unit::TestCase
   def test_view_files
     files = GettextToI18n::Files.view_files
     assert_not_nil files, "no files available"
-    assert files.size == 1
+    assert files.size > 0
   end
   
   
@@ -44,13 +44,12 @@ class GettextToI18nTest < Test::Unit::TestCase
   
   def test_transform
     a = GettextToI18n::Base.new
-    puts YAML::dump( a.translations)
+    puts a.dump_yaml
   end
   
   
   def test_line_transform
-    convertor = GettextToI18n::Convertor.new('test')
-    
+    convertor = GettextToI18n::Convertor.new('test')  
     assert_equal "a", convertor.get_method_contents("_(a)")
     assert_equal "\"some translation\"", convertor.get_method_contents('_("some translation")')
     assert_equal '{"%{some}" % {:some => s}', convertor.get_method_contents('_({"%{some}" % {:some => s})')
