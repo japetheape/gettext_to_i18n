@@ -5,7 +5,9 @@ module GettextToI18n
    GETTEXT_VARIABLES = /\%\{(\w+)\}*/
    attr_reader :translations
    
-   def initialize(file, options = {})
+   def initialize(file, translations, type, options = {})
+     @type = type
+     @translations = translations
      @file = file
      @options = options
    end
@@ -58,7 +60,7 @@ module GettextToI18n
    
    # generates an id for the content of the method
    def get_id(contents)
-     return "message_%s" % (@translations.nil? ? 0 : @translations.size)
+     return "message_%s" % (get_namespace.size)
    end
    
   
@@ -80,9 +82,44 @@ module GettextToI18n
    
    # Add translation, id cannot be used twice
    def add_translation(id, translation)
-     @translations = {} if @translations.nil?
-     raise "translation already exists" unless @translations[id].nil?
-     @translations[id] = translation
+     get_namespace[id] = translation
    end
+   
+   
+   def get_namespace
+     file_name = Convertor.get_name(@file, @type)
+     @translations[@type] = {} if @translations[@type].nil?
+     @translations[@type][file_name] = {} if @translations[@type][file_name].nil?
+     @translations[@type][file_name]
+   end
+   
+   
+   
+   private
+   
+   # returns a name for a file
+   # example: 
+   # Base.get_name('/controllers/apidoc_controller.rb', 'controller') => 'apidoc'
+   def self.get_name(file, type)
+     case type
+       
+       when :controller
+         if result = /application\.rb/.match(file)
+           return 'application'
+         else
+           result = /([a-zA-Z]+)_controller.rb/.match(file)
+           return result[1]
+         end
+         return ""
+       when :helper
+         result = /([a-zA-Z]+)_helper.rb/.match(file)
+         return result[1]
+       when :view
+         result = /views\/([\_a-zA-Z]+)\//.match(file)
+         return result[1]
+     end
+   end
+   
+   
  end
 end
