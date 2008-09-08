@@ -1,7 +1,8 @@
 GettextToI18n
 =============
 
-Introduction goes here.
+This plugin will convert all of your existing Gettext calls( _('some translation') ) to something like I18n::t 'controller.id'.
+
 
 
 Example
