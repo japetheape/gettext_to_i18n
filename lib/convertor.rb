@@ -41,7 +41,6 @@ module GettextToI18n
    # a new i18n method. in the line
    def get_translation_and_id(line)
      if content = get_method_contents(line)
-      
        vars = get_method_vars(line)
        id = get_id(content)
        return {:id => id, :vars => vars, :contents => content}
@@ -60,7 +59,12 @@ module GettextToI18n
    
    # generates an id for the content of the method
    def get_id(contents)
-     return "message_%s" % (get_namespace.size)
+     id = "message_%s" % (get_namespace.size)
+     get_namespace.each do |i,v|
+       id = i if v == contents
+     end
+     
+     return id
    end
    
   
