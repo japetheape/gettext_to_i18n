@@ -3,6 +3,9 @@ module GettextToI18n
    
    GETTEXT_METHOD = /\_\(([\''\%\{\}\=\>\:a-zA-Z0-9 \"]*)\)/
    GETTEXT_VARIABLES = /\%\{(\w+)\}*/
+   GETTEXT_VARIABLE_CONTENTS = /:(\w+)[ *]\=\>[ *]([a-zA-Z\_\-\:\'\"\.\#]+)/
+   
+   
    attr_reader :translations
    
    def initialize(file, translations, type, options = {})
@@ -31,7 +34,13 @@ module GettextToI18n
              add_translation(result[:id], contents)
           end
           
-          # TODO change line
+          i18ncall = construct_i18n_call(result[:id], line)
+          puts "-----------"
+          
+          puts line
+          puts contents
+          puts i18ncall
+           
        end
      end
    end
@@ -41,9 +50,8 @@ module GettextToI18n
    # a new i18n method. in the line
    def get_translation_and_id(line)
      if content = get_method_contents(line)
-       vars = get_method_vars(line)
        id = get_id(content)
-       return {:id => id, :vars => vars, :contents => content}
+       return {:id => id, :contents => content}
      else
        return nil
      end
@@ -67,18 +75,9 @@ module GettextToI18n
      return id
    end
    
-  
-   
-   # convert the gettext method contents to an i18n content
-   def get_method_vars(contents)
-     if result = contents.scan(GETTEXT_VARIABLES)
-       return result
-     end
-   end
-   
    
    def convert_contents_to_i18n(contents)
-    contents.gsub!(GETTEXT_VARIABLES, '[[\1]]')
+    contents.gsub!(GETTEXT_VARIABLES, '{{\1}}')
     contents.gsub!(/^(\"|\')/, '')
     contents.gsub!(/(\"|\')$/, '')
     contents
@@ -97,7 +96,31 @@ module GettextToI18n
      @translations[@type][file_name]
    end
    
+   def get_namespace_i18n
+     file_name = Convertor.get_name(@file, @type)
+     "[:#{@type}, :#{file_name}]"
+   end
    
+    # convert the gettext method contents to an i18n content
+    def get_method_vars(contents)
+      
+      if result = contents.scan(GETTEXT_VARIABLE_CONTENTS)
+        return result
+      end
+    end
+   
+   # Constructs a I18n method call
+   # I18n.translate :thanks, :name => 'Jeremy'
+   # => "Thanks Jeremy"
+   def construct_i18n_call(id, contents)
+     vars = get_method_vars(contents)
+     o = "t :#{id}"
+     vars.each do |v|
+       o << ", :#{v[0]} => #{v[1]}"
+     end
+     o << ", :scope => " + get_namespace_i18n
+     o
+   end
    
    private
    

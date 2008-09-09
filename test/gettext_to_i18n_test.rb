@@ -3,7 +3,9 @@ require File.dirname(__FILE__) + '/../init.rb'
 require 'YAML'
 
 class GettextToI18nTest < Test::Unit::TestCase
-  
+  def setup
+    @c = GettextToI18n::Convertor.new(nil,nil,nil,nil)
+  end
   def test_all_files
     files = GettextToI18n::Files.all_files
     assert_not_nil files, "no files available"
@@ -41,7 +43,20 @@ class GettextToI18nTest < Test::Unit::TestCase
   
   def test_transform
     a = GettextToI18n::Base.new
-    puts a.dump_yaml
+    #puts a.dump_yaml
+  end
+  
+  
+  
+  def test_get_vars
+    assert_equal [['name', "'jaap'"]], @c.get_method_vars("\"hallo %{name}\" % {:name => 'jaap'}")
+    assert_equal [['name', "vara"]], @c.get_method_vars("\"\" % {:name => vara}")
+    assert_equal [['name', "\"jaap\""]], @c.get_method_vars("\"hallo %{name}\" % {:name => \"jaap\"}")
+  end
+  
+  
+  def test_i18n_convert
+    assert_equal "t :message1, :name => \"jaap\"", @c.construct_i18n_call('message1', "\"hallo %{name}\" % {:name => \"jaap\"}")
   end
   
   

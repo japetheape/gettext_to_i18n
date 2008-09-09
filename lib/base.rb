@@ -1,4 +1,5 @@
 module GettextToI18n
+  
   class Base
     attr_reader :translations
     
@@ -10,14 +11,13 @@ module GettextToI18n
 
     end
     
-    def transform_files!(files, type)
-      
+    def transform_files!(files, type)  
       files.each do |file|
         convertor = Convertor.new(file, @translations, type)
         convertor.transform!
-        
       end
     end
+    
     
     def dump_yaml
       YAML::dump(@translations)
