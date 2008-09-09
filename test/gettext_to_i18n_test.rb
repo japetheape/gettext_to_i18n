@@ -45,20 +45,7 @@ class GettextToI18nTest < Test::Unit::TestCase
     a = GettextToI18n::Base.new
     #puts a.dump_yaml
   end
-  
-  
-  
-  def test_get_vars
-    assert_equal [['name', "'jaap'"]], @c.get_method_vars("\"hallo %{name}\" % {:name => 'jaap'}")
-    assert_equal [['name', "vara"]], @c.get_method_vars("\"\" % {:name => vara}")
-    assert_equal [['name', "\"jaap\""]], @c.get_method_vars("\"hallo %{name}\" % {:name => \"jaap\"}")
-  end
-  
-  
-  def test_i18n_convert
-    assert_equal "t(:message1, :name => \"jaap\", :scope => [])", @c.construct_i18n_call('message1', "\"hallo %{name}\" % {:name => \"jaap\"}")
-  end
-  
+   
   
   def test_line_transform
     convertor = GettextToI18n::Convertor.new('test', {}, :controller)  
@@ -69,8 +56,15 @@ class GettextToI18nTest < Test::Unit::TestCase
     
     line = "<%=link_to_fp_share image_tag(\"controlbar/icon-share.gif\"), :title => _('Sharing options') %>"
     assert_equal "'Sharing options'", convertor.get_method_contents(line)
-    assert_equal [], convertor.get_method_vars(line)
+    assert_equal [], GettextToI18n::GettextHelper.get_method_vars(line)
+    
+    
+    line = "<%=_(\"You have %{days} days left of your trial period. Click %{link} to setup payments.\" % {:days => current_user.membership.days_till_end_trial, :link => link_to(_('here'), :controller => \"account\", :action => \"payment_subscription\") }) %>"
+    assert GettextToI18n::GettextHelper.get_method_vars(line).size == 1
     
   end
+  
+  
+ 
   
 end

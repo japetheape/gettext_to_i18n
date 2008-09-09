@@ -2,9 +2,9 @@ module GettextToI18n
   class Convertor
    
    GETTEXT_METHOD = /\_\(([\''\%\{\}\=\>\:a-zA-Z0-9 \"]*)\)/
-   GETTEXT_VARIABLES = /\%\{(\w+)\}*/
+ 
   # GETTEXT_VARIABLE_CONTENTS = /:(\w+)[ *]\=\>[ *]([a-zA-Z\_\-\:\'\(\)\"\.\#]+)/
-   GETTEXT_VARIABLE_CONTENTS = /_\(.*:(\w+)[ *]\=\>[ *]([a-zA-Z\_\-\:\'\(\)\"\.\#]+)/
+  
    
    
    attr_reader :translations
@@ -22,19 +22,17 @@ module GettextToI18n
        # check if there is a gettext method in this line
        # TODO multiple line methods
        if result = get_translation_and_id(line)
-          contents = convert_contents_to_i18n(result[:contents])
+          contents = I18nHelper.convert_contents(result[:contents])
           add_translation(result[:id], contents)
-         
-          i18ncall = construct_i18n_call(result[:id], line)
+          # get namespace we live in
+          i18n_namespace = I18nHelper.get_namespace([@type, Convertor.get_name(@file, @type)])
+          i18ncall = I18nHelper.construct_call(result[:id], line, i18n_namespace)
+          
+          
           #puts "-----------"
-          #puts line
-          #line.gsub!(/(\_\(.+\))/, i18ncall)
-          #
-          #
-          #puts line
-          #puts contents
-          #puts 
-           
+          puts i18ncall
+         
+         
        end
      end
    end
@@ -61,8 +59,8 @@ module GettextToI18n
    
    # generates an id for the content of the method
    def get_id(contents)
-     id = "message_%s" % (get_namespace.size)
-     get_namespace.each do |i,v|
+     id = "message_%s" % (get_namespace_translation_array.size)
+     get_namespace_translation_array.each do |i,v|
        id = i if v == contents
      end
      
@@ -70,51 +68,26 @@ module GettextToI18n
    end
    
    
-   def convert_contents_to_i18n(contents)
-    contents.gsub!(GETTEXT_VARIABLES, '{{\1}}')
-    contents.gsub!(/^(\"|\')/, '')
-    contents.gsub!(/(\"|\')$/, '')
-    contents
-   end
+
    
    # Add translation, id cannot be used twice
    def add_translation(id, translation)
-     get_namespace[id] = translation
+     get_namespace_translation_array[id] = translation
    end
    
    
-   def get_namespace
+   def get_namespace_translation_array
      file_name = Convertor.get_name(@file, @type)
      @translations[@type] = {} if @translations[@type].nil?
      @translations[@type][file_name] = {} if @translations[@type][file_name].nil?
      @translations[@type][file_name]
    end
    
-   def get_namespace_i18n
-     file_name = Convertor.get_name(@file, @type)
-     if !file_name.nil? && !@type.nil?
-       "[:#{@type}, :#{file_name}]"
-     else
-       "[]"
-     end
-   end
+ 
    
-    # convert the gettext method contents to an i18n content
-    def get_method_vars(contents)
-      if result = contents.scan(GETTEXT_VARIABLE_CONTENTS)
-        return result 
-      end
-    end
+
    
-   # Constructs a I18n method call
-   # I18n.translate :thanks, :name => 'Jeremy'
-   # => "Thanks Jeremy"
-   def construct_i18n_call(id, contents)
-     vars = get_method_vars(contents)
-     o = "t(:#{id}"
-     vars.each { |v| o << ", :#{v[0]} => #{v[1]}" }
-     o + ", :scope => " + get_namespace_i18n + ")"
-   end
+ 
    
    private
    
