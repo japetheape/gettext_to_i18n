@@ -27,7 +27,9 @@ module GettextToI18n
     private 
     
     def self.chdir
-      Dir.chdir(File.join(File.dirname(__FILE__), '..', '..', '..','..'))
+      
+      
+      Dir.chdir(RAILS_ROOT)
     end
 
     # All files we need to walk
