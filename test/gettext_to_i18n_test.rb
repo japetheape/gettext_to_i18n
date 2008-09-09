@@ -56,7 +56,7 @@ class GettextToI18nTest < Test::Unit::TestCase
   
   
   def test_i18n_convert
-    assert_equal "t :message1, :name => \"jaap\"", @c.construct_i18n_call('message1', "\"hallo %{name}\" % {:name => \"jaap\"}")
+    assert_equal "t(:message1, :name => \"jaap\", :scope => [])", @c.construct_i18n_call('message1', "\"hallo %{name}\" % {:name => \"jaap\"}")
   end
   
   

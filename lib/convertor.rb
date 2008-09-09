@@ -3,7 +3,7 @@ module GettextToI18n
    
    GETTEXT_METHOD = /\_\(([\''\%\{\}\=\>\:a-zA-Z0-9 \"]*)\)/
    GETTEXT_VARIABLES = /\%\{(\w+)\}*/
-   GETTEXT_VARIABLE_CONTENTS = /:(\w+)[ *]\=\>[ *]([a-zA-Z\_\-\:\'\"\.\#]+)/
+   GETTEXT_VARIABLE_CONTENTS = /:(\w+)[ *]\=\>[ *]([a-zA-Z\_\-\:\'\(\)\"\.\#]+)/
    
    
    attr_reader :translations
@@ -22,24 +22,17 @@ module GettextToI18n
        # TODO multiple line methods
        if result = get_translation_and_id(line)
           contents = convert_contents_to_i18n(result[:contents])
-          if @options[:ask_for_identifiers]
-            puts "#{@file}: Enter message id for #{result[:contents]}: [#{result[:id]}]"
-            id = STDIN.gets.chomp
-            unless id == ""
-              add_translation(id, result[:contents])
-            else
-              add_translation(result[:id], result[:contents])
-            end
-          else
-             add_translation(result[:id], contents)
-          end
-          
+          add_translation(result[:id], contents)
+         
           i18ncall = construct_i18n_call(result[:id], line)
           puts "-----------"
           
+          line.gsub!(/(\_\(.+\))/, i18ncall)
+          
+          
           puts line
           puts contents
-          puts i18ncall
+          puts 
            
        end
      end
@@ -98,14 +91,17 @@ module GettextToI18n
    
    def get_namespace_i18n
      file_name = Convertor.get_name(@file, @type)
-     "[:#{@type}, :#{file_name}]"
+     if !file_name.nil? && !@type.nil?
+       "[:#{@type}, :#{file_name}]"
+     else
+       "[]"
+     end
    end
    
     # convert the gettext method contents to an i18n content
     def get_method_vars(contents)
-      
       if result = contents.scan(GETTEXT_VARIABLE_CONTENTS)
-        return result
+        return result 
       end
     end
    
@@ -114,12 +110,9 @@ module GettextToI18n
    # => "Thanks Jeremy"
    def construct_i18n_call(id, contents)
      vars = get_method_vars(contents)
-     o = "t :#{id}"
-     vars.each do |v|
-       o << ", :#{v[0]} => #{v[1]}"
-     end
-     o << ", :scope => " + get_namespace_i18n
-     o
+     o = "t(:#{id}"
+     vars.each { |v| o << ", :#{v[0]} => #{v[1]}" }
+     o + ", :scope => " + get_namespace_i18n + ")"
    end
    
    private
