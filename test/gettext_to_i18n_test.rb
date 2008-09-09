@@ -65,8 +65,12 @@ class GettextToI18nTest < Test::Unit::TestCase
     assert_equal "a", convertor.get_method_contents("_(a)")
     assert_equal "\"some translation\"", convertor.get_method_contents('_("some translation")')
     assert_equal '{"%{some}" % {:some => s}', convertor.get_method_contents('_({"%{some}" % {:some => s})')
-    
     assert_nil convertor.get_method_contents('jes jes _(')
+    
+    line = "<%=link_to_fp_share image_tag(\"controlbar/icon-share.gif\"), :title => _('Sharing options') %>"
+    assert_equal "'Sharing options'", convertor.get_method_contents(line)
+    assert_equal [], convertor.get_method_vars(line)
+    
   end
   
 end

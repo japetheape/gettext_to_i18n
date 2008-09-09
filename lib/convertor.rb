@@ -3,7 +3,8 @@ module GettextToI18n
    
    GETTEXT_METHOD = /\_\(([\''\%\{\}\=\>\:a-zA-Z0-9 \"]*)\)/
    GETTEXT_VARIABLES = /\%\{(\w+)\}*/
-   GETTEXT_VARIABLE_CONTENTS = /:(\w+)[ *]\=\>[ *]([a-zA-Z\_\-\:\'\(\)\"\.\#]+)/
+  # GETTEXT_VARIABLE_CONTENTS = /:(\w+)[ *]\=\>[ *]([a-zA-Z\_\-\:\'\(\)\"\.\#]+)/
+   GETTEXT_VARIABLE_CONTENTS = /_\(.*:(\w+)[ *]\=\>[ *]([a-zA-Z\_\-\:\'\(\)\"\.\#]+)/
    
    
    attr_reader :translations
@@ -25,14 +26,14 @@ module GettextToI18n
           add_translation(result[:id], contents)
          
           i18ncall = construct_i18n_call(result[:id], line)
-          puts "-----------"
-          
-          line.gsub!(/(\_\(.+\))/, i18ncall)
-          
-          
-          puts line
-          puts contents
-          puts 
+          #puts "-----------"
+          #puts line
+          #line.gsub!(/(\_\(.+\))/, i18ncall)
+          #
+          #
+          #puts line
+          #puts contents
+          #puts 
            
        end
      end
