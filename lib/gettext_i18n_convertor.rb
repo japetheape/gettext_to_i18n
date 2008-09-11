@@ -99,6 +99,21 @@ module GettextToI18n
       output
     end
     
+    
+    
+    #######TEMP#########
+    # Converts the gettext contents to i18n contents
+    # It rewrites the variables
+    def self.convert_contents(contents)
+      contents.gsub!(GettextHelper::GETTEXT_VARIABLES, '{{\1}}')
+      contents.gsub!(/^(\"|\')/, '')
+      contents.gsub!(/(\"|\')$/, '')
+      contents
+    end
+
+     
+    
+    
     private 
     
     # Finds indexes of some pattern(regexp) in a string

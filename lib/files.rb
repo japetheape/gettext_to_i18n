@@ -1,8 +1,7 @@
 # GettextToI18n
 module GettextToI18n
-  
   class Files
-   
+    
     # all files that contain some gettext methods
     def self.all_files
       self.controller_files + self.view_files + self.helper_files
