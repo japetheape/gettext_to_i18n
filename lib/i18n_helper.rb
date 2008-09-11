@@ -24,8 +24,7 @@ module GettextToI18n
     
     def self.get_namespace(arr = [])
       "[" + arr.collect {|v| ":#{v}"}.join(",") + "]"
-      
-       
-     end
+    end
+     
   end
 end

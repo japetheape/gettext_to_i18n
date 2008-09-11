@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/../init.rb'
 require 'YAML'
 
 module GettextToI18n
-  class GettextHelperTest < Test::Unit::TestCase
+  class I18nHelperTest < Test::Unit::TestCase
     
     def test_i18n_convert
       i18n_namespace = I18nHelper.get_namespace()

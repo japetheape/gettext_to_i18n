@@ -17,23 +17,29 @@ module GettextToI18n
    end
    
    def transform!
+     n = Namespace.new(@file)
      File.read(@file).each do |line|
+        puts line
+        tr_str = GettextI18nConvertor.string_to_i18n(line, n)
+        puts tr_str
+       
        
        # check if there is a gettext method in this line
        # TODO multiple line methods
-       if result = get_translation_and_id(line)
-          contents = I18nHelper.convert_contents(result[:contents])
-          add_translation(result[:id], contents)
+  #     if result = get_translation_and_id(line)
+   #       contents = I18nHelper.convert_contents(result[:contents])
+    #      add_translation(result[:id], contents)
           # get namespace we live in
-          i18n_namespace = I18nHelper.get_namespace([@type, Convertor.get_name(@file, @type)])
-          i18ncall = I18nHelper.construct_call(result[:id], line, i18n_namespace)
+    #      i18n_namespace = I18nHelper.get_namespace([@type, Convertor.get_name(@file, @type)])
+    #      i18ncall = I18nHelper.construct_call(result[:id], line, i18n_namespace)
           
           
           #puts "-----------"
-          puts i18ncall
+    #      puts line
+    #      puts i18ncall
          
          
-       end
+    #   end
      end
    end
    

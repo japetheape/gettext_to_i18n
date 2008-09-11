@@ -6,6 +6,8 @@ require File.dirname(__FILE__) + '/lib/files'
 require File.dirname(__FILE__) + '/lib/convertor'
 require File.dirname(__FILE__) + '/lib/gettext_helper'
 require File.dirname(__FILE__) + '/lib/i18n_helper'
+require File.dirname(__FILE__) + '/lib/namespace'
+require File.dirname(__FILE__) + '/lib/gettext_i18n_convertor'
 require File.dirname(__FILE__) + '/lib/base'
 
 
