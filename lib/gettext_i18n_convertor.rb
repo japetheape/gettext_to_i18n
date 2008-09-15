@@ -2,6 +2,8 @@ module GettextToI18n
   class GettextI18nConvertor
     attr_accessor :text
     
+    GETTEXT_VARIABLES = /\%\{(\w+)\}*/
+    
     def initialize(text, namespace = nil)
       @text = text
       @namespace = namespace
@@ -9,8 +11,28 @@ module GettextToI18n
     
     # The contents of the method call
     def contents
-      /\_\([\"\']([^\'\"]*)[\"\'].*\)/.match(@text)[1]
+      if result = /\_\([\"\']?([^\'\"]*)[\"\']?.*\)/.match(@text)
+      #if result = /\_\([\"\'](.*)[\"\']\)/.match(@text)
+        return result[1]
+      else
+        return nil
+      end
     end
+    
+    def contents_i18n
+      c = contents
+      unless c.nil?
+        c.gsub!(GETTEXT_VARIABLES, '{{\1}}')
+        c.gsub!(/^(\"|\')/, '')
+        c.gsub!(/(\"|\')$/, '')
+      else
+        puts "No content: " + @text
+        
+      end
+      c
+    end
+    
+
     
     # Returns the part after the method call, 
     # _('aaa' % :a => 'sdf', :b => 'agh') 
@@ -66,11 +88,13 @@ module GettextToI18n
     # it is now time to construct the actual i18n call
     def to_i18n
       id = @namespace.consume_id!
+      @namespace.set_id(id, contents_i18n)
       output = "t(:#{id}"
       if !self.variables.nil?
           vars = self.variables.collect { |h| {:name => h[:name], :value => h[:value] }}
           output += ", " + vars.collect {|h| ":#{h[:name]} => #{h[:value]}"}.join(", ")
       end
+      output += ", " + @namespace.to_i18n_scope
       output += ")"
       return output
     end
@@ -80,8 +104,10 @@ module GettextToI18n
     def self.string_to_i18n(text, namespace)
       s = self.indexes_of(text, /_\(/)
       e = self.indexes_of(text, /\)/)
+      r = self.indexes_of(text, /\(/)
       
-      indent, startindex, endinde, methods  = 0, -1, -1, []
+      indent, indent_all,startindex, endinde, methods  = 0, 0, -1, -1, []
+      
       output = ""
       text.length.times do |i|
         if s.include?(i)
@@ -89,11 +115,20 @@ module GettextToI18n
           indent += 1
         end
         
+        
+        if r.include?(i)
+          indent_all += 1
+        end
+        
+        
         output += text[i..i].to_s if indent <= 0
        
         if e.include?(i)
-          indent -= 1
-          if indent == 0
+          indent -= 1 if indent == indent_all
+          indent_all -= 1
+          
+          
+          if indent == 0 && startindex != -1
             endindex = i
             output += GettextI18nConvertor.new(text[startindex..endindex], namespace).to_i18n 
           end
@@ -103,17 +138,7 @@ module GettextToI18n
     end
     
     
-    
-    #######TEMP#########
-    # Converts the gettext contents to i18n contents
-    # It rewrites the variables
-    def self.convert_contents(contents)
-      contents.gsub!(GettextHelper::GETTEXT_VARIABLES, '{{\1}}')
-      contents.gsub!(/^(\"|\')/, '')
-      contents.gsub!(/(\"|\')$/, '')
-      contents
-    end
-
+   
      
     
     

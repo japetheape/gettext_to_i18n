@@ -3,7 +3,7 @@
 require 'YAML'
 require File.dirname(__FILE__) + '/../../../config/boot'
 require File.dirname(__FILE__) + '/lib/files'
-require File.dirname(__FILE__) + '/lib/convertor'
+
 
 
 require File.dirname(__FILE__) + '/lib/namespace'
