@@ -2,15 +2,15 @@ GettextToI18n
 =============
 
 ABOUT
-This plugin will convert your complete Rails project from Gettext calls to the new I18N api calls introduced in Rails 2.2.2.
-NB: This plugin is higly experimental, so before running, BACKUP YOUR CODE, it will touch your code, if you use it and it may go wrong!
+This plugin will convert your complete Rails project from Gettext calls to the new i18n api calls introduced in Rails 2.2.2. NB: This plugin is higly experimental, so before running, BACKUP YOUR CODE. It will touch your code and things always can go wrong!
+
 
 EXAMPLE
 	<%=_("Some string that will be translated, into %{lan}" % {:lan => 'english'}) %>
 
 will be converted into:
 
-	<%=t(:message_0, :lan => 'english', :scope => [:view, :viewname]) %>
+	<%=t(:message_0, :lan => 'english', :scope => [:controller, :controller_name]) %>
 
 it will then place a entry:
 	
@@ -24,9 +24,9 @@ By default the plugin walks all files in the app directory. It places the messag
 
 	Controllers: translation[:txt][:controller][:controller_name]
 	Views: translation[:txt][:view][:view_colleciton_name]
-	# etc.
+	-> etc.
 	
-
+	
 
 USAGE
 To convert all your views, controllers and models to the new format.
