@@ -29,15 +29,16 @@ module GettextToI18n
     end
     
     def i18n_namespace
-      a = @namespace
-      a.delete("txt")
-      a
+      @cached_i18n_namespace ||= begin
+        a = @namespace.dup
+        a.delete("txt")
+        a
+      end
     end
     
     
     def to_i18n_scope
-      
-      ":scope => [%s]" % i18n_namespace.collect {|x| ":#{x}"}.join(", ")
+      @cached_i18n_scope ||= ":scope => [%s]" % i18n_namespace.collect {|x| ":#{x}"}.join(", ")
     end
     
     
@@ -48,8 +49,6 @@ module GettextToI18n
         arr = 'base' + loc 
         eval  arr + ' = {} if ' + arr + '.nil?' 
       end
-      
-  
       eval 'base' + loc + ' = @ids'
       
     end

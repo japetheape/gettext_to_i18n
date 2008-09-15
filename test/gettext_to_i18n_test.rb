@@ -33,6 +33,13 @@ class GettextToI18nTest < Test::Unit::TestCase
     assert files.size > 0
   end
   
+  def test_lib_files
+    files = GettextToI18n::Files.lib_files
+    assert_not_nil files, "no files available"
+    assert files.size > 0
+  end
+  
+  
   def test_get_filename
     assert_equal 'apidoc', GettextToI18n::Base.get_name('/controllers/apidoc_controller.rb', :controller)
     assert_equal 'application', GettextToI18n::Base.get_name('/controllers/application.rb', :controller)

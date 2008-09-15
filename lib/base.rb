@@ -2,37 +2,34 @@ module GettextToI18n
   
   class Base
     attr_reader :translations
+    LOCALE_DIR = RAILS_ROOT + '/config/locales/'
+    STANDARD_LOCALE_FILE = LOCALE_DIR + 'template.yml'
+    DEFAULT_LANGUAGE = 'some-LAN'
     
     def initialize
       @translations = {}
       transform_files!(Files.controller_files, :controller)
       transform_files!(Files.view_files, :view)
       transform_files!(Files.helper_files, :helper)
-      puts @translations.to_yaml
+      transform_files!(Files.lib_files, :lib)
     end
     
-    
+    # Walks all files and converts them all to the new format
     def transform_files!(files, type)  
-     
       files.each do |file|
         alternative_filename = Base.get_name(file, type)
-        n = Namespace.new(['txt', type, alternative_filename])
+        n = Namespace.new([DEFAULT_LANGUAGE, 'txt', type, alternative_filename])
         File.read(file).each do |line|
-          
           tr_str = GettextI18nConvertor.string_to_i18n(line, n)
-          
         end
         n.merge(@translations)
       end
-    
-      
     end
     
-    
-    
-    
-    def dump_yaml
-      YAML::dump(@translations)
+    # Dumps the translation strings into config/locales/template.yml
+    def dump_yaml!
+      FileUtils.mkdir_p LOCALE_DIR
+      File.open(STANDARD_LOCALE_FILE,'w+') { |f| YAML::dump(@translations, f) } 
     end
     
     
@@ -58,6 +55,9 @@ module GettextToI18n
        when :view
          result = /views\/([\_a-zA-Z]+)\//.match(file)
          return result[1]
+        when :lib
+          result = /([a-zA-Z]+).rb/.match(file)
+          return result[1]
      end
     end
     
