@@ -109,30 +109,39 @@ module GettextToI18n
       indent, indent_all,startindex, endinde, methods  = 0, 0, -1, -1, []
       
       output = ""
+      level = 0
+      gettext_blocks = []
       text.length.times do |i|
-        if s.include?(i)
-          startindex = i if indent == 0
-          indent += 1
-        end
-        
-        
-        if r.include?(i)
-          indent_all += 1
-        end
-        
-        
-        output += text[i..i].to_s if indent <= 0
+        token = text[i..i]
        
-        if e.include?(i)
-          indent -= 1 if indent == indent_all
-          indent_all -= 1
-          
-          
-          if indent == 0 && startindex != -1
-            endindex = i
-            output += GettextI18nConvertor.new(text[startindex..endindex], namespace).to_i18n 
+        in_gettext_block = gettext_blocks.size % 2 == 1
+        if !in_gettext_block
+          if ! /_\(/.match(token + text[i+1..i+1]).nil?
+            gettext_blocks << i
+            level = 0
           end
+        else # in a block
+          level += 1 if ! /\(/.match(token).nil? && gettext_blocks[gettext_blocks.length - 1] != i - 1
+          gettext_blocks << i if level == 0 && /\)/.match(token)
+          level -= 1 if /\)/.match(token) && level != 0
         end
+      end
+      
+      i = 0
+      output = text.dup
+      offset = 0
+      
+      (gettext_blocks.length / 2).times do |i|
+        
+        s = gettext_blocks[i * 2]
+        e = gettext_blocks[i * 2 + 1]
+        to_convert = text[s..e]
+       
+        converted_block = GettextI18nConvertor.new(to_convert, namespace).to_i18n
+        g = output.index(to_convert) - 1
+        
+        h = g + (e-s) + 2
+        output = output[0..g] + converted_block + output[h..output.length]
       end
       output
     end

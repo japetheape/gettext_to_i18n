@@ -5,7 +5,7 @@ module GettextToI18n
     LOCALE_DIR = RAILS_ROOT + '/config/locales/'
     STANDARD_LOCALE_FILE = LOCALE_DIR + 'template.yml'
     DEFAULT_LANGUAGE = 'some-LAN'
-    
+
     def initialize
       @translations = {}
       transform_files!(Files.controller_files, :controller)
@@ -17,11 +17,16 @@ module GettextToI18n
     # Walks all files and converts them all to the new format
     def transform_files!(files, type)  
       files.each do |file|
+        parsed = ""
         alternative_filename = Base.get_name(file, type)
         n = Namespace.new([DEFAULT_LANGUAGE, 'txt', type, alternative_filename])
+        
         File.read(file).each do |line|
-          tr_str = GettextI18nConvertor.string_to_i18n(line, n)
+          parsed << GettextI18nConvertor.string_to_i18n(line, n)
         end
+        
+        # write the file
+        File.open(file, 'w') { |file| file.write(parsed)}
         n.merge(@translations)
       end
     end

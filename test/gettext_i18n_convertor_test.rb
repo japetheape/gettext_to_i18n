@@ -69,7 +69,10 @@ module GettextToI18n
       t =  GettextI18nConvertor.string_to_i18n(str, Namespace.new('d'))
       
       
+      str = "o << content_tag(:div, _(\"Plan your own home with the free floorplanner\"), :class => \"content\")"
       
+      t =  GettextI18nConvertor.string_to_i18n(str, Namespace.new('d'))
+      puts t
       
     end
     

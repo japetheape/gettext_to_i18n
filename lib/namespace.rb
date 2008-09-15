@@ -32,6 +32,7 @@ module GettextToI18n
       @cached_i18n_namespace ||= begin
         a = @namespace.dup
         a.delete("txt")
+        a.delete(Base::DEFAULT_LANGUAGE)
         a
       end
     end
