@@ -67,5 +67,15 @@ module GettextToI18n
 
       
     end
+    
+    
+    def test_sime
+
+       str = " <%=_('Pay per %{period}' % {:period => pv.period}) %> (<%=show_price(pv.price.convert_to(default_currency).get_rounded_on(Membership::ROUND_PRICES_ON_CENTS), pv.price.convert_to(default_currency).currency) %> / <%=pv.period %>). <br />"
+       puts GettextI18nConvertor.string_to_i18n(str, Namespace.new('d'))
+       
+       
+       
+    end
   end
 end

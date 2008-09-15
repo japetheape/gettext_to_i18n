@@ -63,8 +63,7 @@ class GettextToI18nTest < Test::Unit::TestCase
     assert GettextToI18n::GettextHelper.get_method_vars(line).size == 1
     
   end
-  
-  
+
  
   
 end

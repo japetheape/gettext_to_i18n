@@ -80,6 +80,7 @@ module GettextToI18n
     def self.string_to_i18n(text, namespace)
       s = self.indexes_of(text, /_\(/)
       e = self.indexes_of(text, /\)/)
+      
       indent, startindex, endinde, methods  = 0, -1, -1, []
       output = ""
       text.length.times do |i|
@@ -87,7 +88,9 @@ module GettextToI18n
           startindex = i if indent == 0
           indent += 1
         end
-        output += text[i..i].to_s if indent == 0
+        
+        output += text[i..i].to_s if indent <= 0
+       
         if e.include?(i)
           indent -= 1
           if indent == 0
