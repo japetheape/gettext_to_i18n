@@ -17,28 +17,28 @@ module GettextToI18n
     def test_variables
       assert_equal ":a => 'sdasd', :b => 'sdasd'", GettextI18nConvertor.new("_('a   ' % {:a => 'sdasd', :b => 'sdasd'})").variable_part
       assert_equal [{:name => "a", :value => "'sdasd'"}, {:name => "b", :value => "'sdasd'"}], GettextI18nConvertor.new("_('a   ' % {:a => 'sdasd', :b => 'sdasd'})").variables
-      assert_equal "t(:message_0, :a => 'sdasd', :scope => [:somenamespace])", GettextI18nConvertor.new("_('a   ' % {:a => 'sdasd'})", Namespace.new("somenamespace")).to_i18n
-      assert_equal "t(:message_0, :a => 'sdasd', :b => 'sd', :scope => [:somenamespace])", GettextI18nConvertor.new("_('a   ' % {:a => 'sdasd', :b => 'sd'})", Namespace.new("somenamespace")).to_i18n
+      assert_equal "I18n.t(:message_0, :a => 'sdasd', :scope => [:somenamespace])", GettextI18nConvertor.new("_('a   ' % {:a => 'sdasd'})", Namespace.new("somenamespace")).to_i18n
+      assert_equal "I18n.t(:message_0, :a => 'sdasd', :b => 'sd', :scope => [:somenamespace])", GettextI18nConvertor.new("_('a   ' % {:a => 'sdasd', :b => 'sd'})", Namespace.new("somenamespace")).to_i18n
       assert_equal ":a => 'sdf' + _(sdf)", GettextI18nConvertor.new("_('aaa' % {:a => 'sdf' + _(sdf)}) %>", Namespace.new("somenamespace")).variable_part
     end
     
     def test_multiple_variables
-      assert_equal "<%=t(:message_0, :a => 'sdf', :b => 'agh', :scope => [:somenamespace]) %>", GettextI18nConvertor.string_to_i18n("<%=_('aaa' % {:a => 'sdf', :b => 'agh'}) %>", Namespace.new("somenamespace")) 
+      assert_equal "<%=I18n.t(:message_0, :a => 'sdf', :b => 'agh', :scope => [:somenamespace]) %>", GettextI18nConvertor.string_to_i18n("<%=_('aaa' % {:a => 'sdf', :b => 'agh'}) %>", Namespace.new("somenamespace")) 
     end
     
     
     def test_recursive_gettext
       t = GettextI18nConvertor.new("<%=_('aaa' % {:a => 'sdf' + _(sdfg) + _(sdfg), :b => '21'}) %>", Namespace.new("somenamespace"))
       assert_equal ":a => 'sdf' + _(sdfg) + _(sdfg), :b => '21'", t.variable_part
-      assert_equal [{:value=>"'sdf' + t(:message_0, :scope => [:somenamespace]) + t(:message_1, :scope => [:somenamespace])", :name=>"a"},  {:value=>"'21'", :name=>"b"}], t.variables
+      assert_equal [{:value=>"'sdf' + I18n.t(:message_0, :scope => [:somenamespace]) + I18n.t(:message_1, :scope => [:somenamespace])", :name=>"a"},  {:value=>"'21'", :name=>"b"}], t.variables
       
-      assert_equal "<%=t(:message_0, :a => 'sdf' + t(:message_1, :scope => [:somenamespace]) + t(:message_2, :scope => [:somenamespace]), :scope => [:somenamespace]) %>", GettextI18nConvertor.string_to_i18n("<%=_('aaa' % {:a => 'sdf' + _(sdfg) + _(sdfg)}) %>", Namespace.new("somenamespace")) 
+      assert_equal "<%=I18n.t(:message_0, :a => 'sdf' + I18n.t(:message_1, :scope => [:somenamespace]) + I18n.t(:message_2, :scope => [:somenamespace]), :scope => [:somenamespace]) %>", GettextI18nConvertor.string_to_i18n("<%=_('aaa' % {:a => 'sdf' + _(sdfg) + _(sdfg)}) %>", Namespace.new("somenamespace")) 
     
     end
     
     
     def test_variable_parts
-      assert_equal "t(:message_0, :a => 'sdasddd', :b => 'sdasd' + t(:message_1, :scope => [:somenamespace]), :scope => [:somenamespace])" , GettextI18nConvertor.new("_('a   ' % {:a => 'sdasddd', :b => 'sdasd' + _('sfd')})", Namespace.new("somenamespace")).to_i18n
+      assert_equal "I18n.t(:message_0, :a => 'sdasddd', :b => 'sdasd' + I18n.t(:message_1, :scope => [:somenamespace]), :scope => [:somenamespace])" , GettextI18nConvertor.new("_('a   ' % {:a => 'sdasddd', :b => 'sdasd' + _('sfd')})", Namespace.new("somenamespace")).to_i18n
     end
     
     
@@ -67,12 +67,24 @@ module GettextToI18n
       str = "_('For more information on large volume plans, customized solutions or (media) partnerships.')"
       #str =  "_(\"%{project_name} (copy)\" % {:project_name => @project.name})"
       t =  GettextI18nConvertor.string_to_i18n(str, Namespace.new('d'))
-      
-      
       str = "o << content_tag(:div, _(\"Plan your own home with the free floorplanner\"), :class => \"content\")"
-      
       t =  GettextI18nConvertor.string_to_i18n(str, Namespace.new('d'))
       puts t
+      
+    end
+    
+    
+    def test_quotes
+      
+      n  =GettextToI18n::Namespace.new("somenamespace")
+      str = "_('The easiest way to <span class=\"highlight\">create</span> and<br /> <span class=\"highlight\">share</span> interactive floorplans')"
+      t = GettextToI18n::GettextI18nConvertor.new(str, n)
+      assert_equal 'The easiest way to <span class="highlight">create</span> and<br /> <span class="highlight">share</span> interactive floorplans', t.contents
+      puts t.text
+      
+      
+      t = GettextToI18n::GettextI18nConvertor.new("_(\"Save\")", n)
+      assert_equal "Save", t.contents
       
     end
     

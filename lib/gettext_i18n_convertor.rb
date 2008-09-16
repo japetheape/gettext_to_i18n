@@ -11,9 +11,16 @@ module GettextToI18n
     
     # The contents of the method call
     def contents
-      if result = /\_\([\"\']?([^\'\"]*)[\"\']?.*\)/.match(@text)
-      #if result = /\_\([\"\'](.*)[\"\']\)/.match(@text)
-        return result[1]
+      #if result = /\_\([\"\']?([^\'\"]*)[\"\']?.*\)/.match(@text)
+      
+      #if result = /\_\(([\']?([^\']*)[\'])|([\"]?([^\"]*)[\"])?.*\)/.match(@text)
+      single_quotes = /\_\(\'([^']*)\'.*\)/.match(@text)
+      double_quotes = /\_\(\"([^"]*)\".*\)/.match(@text)
+      
+      if single_quotes
+        return single_quotes[1]
+      elsif double_quotes
+        return double_quotes[1]
       else
         return nil
       end
@@ -39,7 +46,7 @@ module GettextToI18n
     # return :a => 'sdf', :b => 'agh'
     def variable_part
       @variable_part_cached ||= begin
-          result = /\% \{(.*)\}/.match(@text)
+          result = /\%[\s]+\{(.*)\}/.match(@text)
           if result
               result[1]
           end
@@ -78,7 +85,7 @@ module GettextToI18n
         vsplitted = get_variables_splitted
         return nil if vsplitted.nil?
         vsplitted.map! { |v| 
-          r = v.match(/ *:(\w+) *=> *(.*)/)
+          r = v.match(/\s*:(\w+)\s*=>\s*(.*)/)
           {:name => r[1], :value => GettextI18nConvertor.string_to_i18n(r[2], @namespace)}
         }
       end
@@ -89,7 +96,7 @@ module GettextToI18n
     def to_i18n
       id = @namespace.consume_id!
       @namespace.set_id(id, contents_i18n)
-      output = "t(:#{id}"
+      output = "I18n.t(:#{id}"
       if !self.variables.nil?
           vars = self.variables.collect { |h| {:name => h[:name], :value => h[:value] }}
           output += ", " + vars.collect {|h| ":#{h[:name]} => #{h[:value]}"}.join(", ")

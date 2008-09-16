@@ -19,15 +19,22 @@ module GettextToI18n
     def transform_files!(files, type)  
       files.each do |file|
         parsed = ""
-        alternative_filename = Base.get_name(file, type)
-        n = Namespace.new([DEFAULT_LANGUAGE, 'txt', type, alternative_filename])
+        namespace = [DEFAULT_LANGUAGE, 'txt', type] + Base.get_namespace(file, type)
+        puts "Converting: " + file + " into namespace: "
+        puts namespace.map {|x| "[\"#{x}\"]"}.join("")
         
-        File.read(file).each do |line|
-          parsed << GettextI18nConvertor.string_to_i18n(line, n)
-        end
+        n = Namespace.new(namespace)
         
+        contents = Base.get_file_as_string(file)
+        parsed << GettextI18nConvertor.string_to_i18n(contents, n)
+  
+        #puts parsed
         # write the file
+        
         File.open(file, 'w') { |file| file.write(parsed)}
+        
+        
+        
         n.merge(@translations)
       end
     end
@@ -40,33 +47,46 @@ module GettextToI18n
     
     
     private 
- 
+    
+    
+    def self.get_file_as_string(filename)
+      data = ''
+      f = File.open(filename, "r") 
+      f.each_line do |line|
+        data += line
+      end
+      return data
+    end
     # returns a name for a file
     # example: 
     # Base.get_name('/controllers/apidoc_controller.rb', 'controller') => 'apidoc'
-    def self.get_name(file, type)
+    def self.get_namespace(file, type)
      case type
 
        when :controller
          if result = /application\.rb/.match(file)
-           return 'application'
+           return ['application']
          else
            result = /([a-zA-Z]+)_controller.rb/.match(file)
-           return result[1]
+           return [result[1]]
          end
          return ""
        when :helper
          result = /([a-zA-Z]+)_helper.rb/.match(file)
-         return result[1]
+         return [result[1]]
        when :model
           result = /([a-zA-Z]+).rb/.match(file)
-          return result[1]
+          return [result[1]]
        when :view
-         result = /views\/([\_a-zA-Z]+)\//.match(file)
-         return result[1]
+         result = /views\/([\_a-zA-Z]+)\/([\_a-zA-Z]+).*\.([a-zA-Z]+)/.match(file)
+         if result[3] != "erb"
+           return [result[1], result[2], result[3]]
+         else
+           return [result[1], result[2]] 
+         end
         when :lib
           result = /([a-zA-Z]+).rb/.match(file)
-          return result[1]
+          return [result[1]]
      end
     end
     

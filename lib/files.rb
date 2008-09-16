@@ -14,7 +14,7 @@ module GettextToI18n
     
     # All view files
     def self.view_files
-      self.get_files('app/views', '**/*.erb')
+      self.get_files('app/views', '**/*.{erb,builder}')
     end
     
     # All view files

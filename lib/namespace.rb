@@ -31,7 +31,7 @@ module GettextToI18n
     def i18n_namespace
       @cached_i18n_namespace ||= begin
         a = @namespace.dup
-        a.delete("txt")
+        #a.delete("txt")
         a.delete(Base::DEFAULT_LANGUAGE)
         a
       end
@@ -50,6 +50,7 @@ module GettextToI18n
         arr = 'base' + loc 
         eval  arr + ' = {} if ' + arr + '.nil?' 
       end
+     
       eval 'base' + loc + ' = @ids'
       
     end
