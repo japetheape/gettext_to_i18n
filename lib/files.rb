@@ -4,7 +4,7 @@ module GettextToI18n
     
     # all files that contain some gettext methods
     def self.all_files
-      self.controller_files + self.view_files + self.helper_files + self.lib_files
+      self.controller_files + self.view_files + self.helper_files + self.lib_files + self.model_files
     end
     
     # All controller files
@@ -26,6 +26,11 @@ module GettextToI18n
     # All view files
     def self.helper_files
       self.get_files('app/helpers', '*.rb')
+    end
+    
+    # All view files
+    def self.model_files
+      self.get_files('app/models', '*.rb')
     end
     
     

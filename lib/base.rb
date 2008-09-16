@@ -9,6 +9,7 @@ module GettextToI18n
     def initialize
       @translations = {}
       transform_files!(Files.controller_files, :controller)
+      transform_files!(Files.model_files, :model)
       transform_files!(Files.view_files, :view)
       transform_files!(Files.helper_files, :helper)
       transform_files!(Files.lib_files, :lib)
@@ -57,6 +58,9 @@ module GettextToI18n
        when :helper
          result = /([a-zA-Z]+)_helper.rb/.match(file)
          return result[1]
+       when :model
+          result = /([a-zA-Z]+).rb/.match(file)
+          return result[1]
        when :view
          result = /views\/([\_a-zA-Z]+)\//.match(file)
          return result[1]
