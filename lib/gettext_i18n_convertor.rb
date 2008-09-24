@@ -96,7 +96,7 @@ module GettextToI18n
     def to_i18n
       id = @namespace.consume_id!
       @namespace.set_id(id, contents_i18n)
-      output = "I18n.t(:#{id}"
+      output = "t(:#{id}"
       if !self.variables.nil?
           vars = self.variables.collect { |h| {:name => h[:name], :value => h[:value] }}
           output += ", " + vars.collect {|h| ":#{h[:name]} => #{h[:value]}"}.join(", ")
